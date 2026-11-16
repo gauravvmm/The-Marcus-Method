@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0a0b09" />
+<title>Daily Log — Two People, Four Habits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0a0b09;--ink:#e9e6d8;--soft:rgba(233,230,216,.55);--dim:rgba(233,230,216,.32);--lime:#d6f06b;--rule:rgba(233,230,216,.14);
+--serif:'Instrument Serif','Times New Roman',serif;--sans:'Inter',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,2.4vw,32px) 64px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:clamp(14px,1.8vw,22px) 0 12px;border-bottom:1px solid var(--rule);font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.top .live{color:var(--soft);display:inline-flex;align-items:center;gap:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime);animation:blink 1.6s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+h1{font:400 clamp(52px,8.6vw,132px)/.9 var(--serif);letter-spacing:-.035em;margin:clamp(28px,5vw,64px) 0 8px}
+h1 em{color:var(--lime)}
+.sub{color:var(--soft);font-size:14px;max-width:46ch;margin:0 0 28px;line-height:1.5}
+.datebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.pill{border:1px solid var(--rule);background:rgba(10,11,9,.6);border-radius:999px;padding:10px 14px;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft);cursor:pointer;transition:background .25s,color .25s}
+.pill:hover{color:var(--ink)}
+.pill:focus-visible,.add:focus-visible,input:focus-visible,.finish:focus-visible{outline:1px solid var(--lime);outline-offset:2px}
+.datebar input[type=date]{border:1px solid var(--rule);background:transparent;border-radius:999px;padding:8px 14px;font:500 12px var(--mono);color-scheme:dark}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,32px)}
+.person{border:1px solid var(--rule);border-radius:20px;padding:clamp(16px,2vw,26px);background:rgba(233,230,216,.02)}
+.phead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+.name{background:transparent;border:0;border-bottom:1px solid transparent;font:400 clamp(34px,4vw,52px)/1 var(--serif);letter-spacing:-.03em;width:100%;padding:0}
+.name:hover{border-bottom-color:var(--rule)}
+.score{font:500 11px/1.4 var(--mono);letter-spacing:.12em;color:var(--soft);text-align:right;white-space:nowrap}
+.score b{color:var(--lime);font-weight:500}
+.strip{display:flex;gap:5px;margin:12px 0 18px;align-items:center;font:500 10px var(--mono);color:var(--dim);letter-spacing:.08em}
+.strip i{width:9px;height:9px;border-radius:50%;border:1px solid var(--dim);display:inline-block}
+.strip i.on{background:var(--lime);border-color:var(--lime)}
+.strip span{margin-right:6px}
+.act{padding:16px 0;border-top:1px solid var(--rule)}
+.arow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.aname{font-size:15px}
+.amin{font:500 12px var(--mono);letter-spacing:.06em;color:var(--soft)}
+.amin b{color:var(--ink);font-weight:500}
+.act.done .amin b,.act.done .aname{color:var(--lime)}
+.bar{font:500 13px/1 var(--mono);letter-spacing:.02em;color:var(--lime);margin:10px 0 12px;white-space:nowrap;overflow:hidden}
+.bar s{text-decoration:none;color:var(--dim)}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.add{border:1px solid var(--rule);background:transparent;border-radius:999px;padding:8px 12px;font:500 10.5px/1 var(--mono);letter-spacing:.1em;color:var(--soft);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.add:hover{color:#10120c;background:var(--lime);border-color:var(--lime)}
+.add.ghost:hover{background:transparent;color:var(--ink);border-color:var(--soft)}
+.ctl input{width:64px;background:transparent;border:1px solid var(--rule);border-radius:999px;padding:7px 10px;font:500 11px var(--mono);text-align:center}
+.final{margin-top:18px;border-top:1px solid var(--rule);padding-top:16px;font:400 28px/1 var(--serif);letter-spacing:-.02em;min-height:44px;color:var(--dim)}
+.final.on{color:var(--lime)}
+.foot{margin-top:28px;font:500 10px/1.7 var(--mono);letter-spacing:.08em;color:var(--dim)}
+@media(max-width:700px){.cols{grid-template-columns:1fr}.top .c{display:none}}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}}
+
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1}
+.person{background:rgba(10,11,9,.58);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .6s,box-shadow .6s}
+.person.full{border-color:rgba(214,240,107,.55);box-shadow:0 0 80px rgba(214,240,107,.14),inset 0 0 40px rgba(214,240,107,.05)}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.big{font:400 clamp(72px,12vw,180px)/.8 var(--serif);letter-spacing:-.045em;color:var(--lime);text-shadow:0 0 60px rgba(214,240,107,.25);padding-bottom:8px}
+.big small{display:block;font:500 10.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:14px;text-shadow:none;letter-spacing:.14em}
+.bar{text-shadow:0 0 10px rgba(214,240,107,.45)}
+.act.done{background:linear-gradient(90deg,rgba(214,240,107,.07),transparent 70%)}
+.add:active{transform:scale(.94)}
+h1{text-shadow:0 0 40px rgba(10,11,9,.8)}
+
+.pomo{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin-top:14px;padding:10px 16px 12px;border:1px solid var(--rule);border-radius:18px;background:rgba(10,11,9,.58);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);transition:border-color .4s}
+.pomo.run{border-color:rgba(214,240,107,.5)}
+.pomo .pt{display:flex;align-items:baseline;gap:10px;min-width:118px}
+.pomo strong{font:500 24px/1 var(--mono);letter-spacing:.02em;color:var(--ink)}
+.pomo.run strong{color:var(--lime)}
+.pomo .st{display:inline-flex;align-items:center;gap:6px}
+.pomo .st b{color:var(--ink);font-weight:500;min-width:2ch;text-align:center}
+.pomo .st button{width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:transparent;cursor:pointer;line-height:1;padding:0;color:var(--soft)}
+.pomo .st button:hover{background:var(--lime);color:#10120c;border-color:var(--lime)}
+.pomo .st button:disabled{opacity:.3;pointer-events:none}
+.pomo .pill{padding:9px 13px}
+.pomo .pgo{background:var(--lime);border-color:var(--lime);color:#10120c}
+.pomo .pgo:hover{color:#10120c}
+.pomo .plog{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+.pomo select{background:rgba(10,11,9,.8);border:1px solid var(--rule);border-radius:999px;padding:7px 10px;font:500 10.5px var(--mono);color:var(--ink);color-scheme:dark;max-width:140px}
+.pomo input[type=checkbox]{accent-color:#d6f06b;margin:0}
+.pomo button:focus-visible,.pomo select:focus-visible,.pomo input:focus-visible{outline:1px solid var(--lime);outline-offset:2px}
+.pfill{position:absolute;left:0;bottom:0;height:2px;background:var(--lime);box-shadow:0 0 10px var(--lime);width:0}
+@media(max-width:700px){.pomo .plog{margin-left:0}}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="top"><span>Daily Log</span><span class="c">Four habits · two people</span><span class="live"><i class="dot"></i> <span id="clock">—</span></span></header>
+  <section class="pomo" id="pomo" aria-label="Pomodoro timer">
+    <div class="pt"><span id="pmode">Focus</span><strong id="ptime" role="timer">25:00</strong></div>
+    <div class="st">Focus <button data-k="f" data-d="-5" aria-label="Shorter focus">−</button><b id="pf">25</b><button data-k="f" data-d="5" aria-label="Longer focus">+</button></div>
+    <div class="st">Break <button data-k="b" data-d="-1" aria-label="Shorter break">−</button><b id="pb">5</b><button data-k="b" data-d="1" aria-label="Longer break">+</button></div>
+    <div class="st"><button class="pill pgo" id="pgo" style="width:auto;height:auto;border-radius:999px;color:#10120c">Start</button><button class="pill" id="prs" style="width:auto;height:auto;border-radius:999px">Reset</button></div>
+    <div class="plog"><label class="st"><input type="checkbox" id="pauto" /> Log to</label><select id="pwho" aria-label="Person"></select><select id="pact" aria-label="Activity"></select></div>
+    <div class="pfill" id="pfill"></div>
+  </section>
+  <div class="hero">
+    <div>
+      <h1>Log the minutes.<br /><em>Close the day.</em></h1>
+      <p class="sub">Four activities, a daily target each. Every minute you log opens the flower a little more.</p>
+    </div>
+    <div class="big" aria-live="polite"><span id="pct">0</span>%<small>of today's minutes, both of you</small></div>
+  </div>
+  <div class="datebar">
+    <button class="pill" id="prev" aria-label="Previous day">Prev</button>
+    <input type="date" id="date" aria-label="Date" />
+    <button class="pill" id="next" aria-label="Next day">Next</button>
+    <button class="pill" id="today">Today</button>
+  </div>
+  <main class="cols" id="cols"></main>
+  <p class="foot">Saved on the server and shared between you both. Click a name to rename it. Targets live in the ACTIVITIES list at the top of the script.</p>
+</div>
+
+<script>
+/* ---- EDIT HERE: activities and daily targets (minutes) ---- */
+const ACTIVITIES = [
+  { id: 'trading',  label: 'Trading',          target: 60  },
+  { id: 'academics',label: 'Academics',        target: 300 },
+  { id: 'fitness',  label: 'Fitness',          target: 30  },
+  { id: 'growth',   label: 'Self-improvement', target: 30  },
+];
+const QUICK = [5, 15, 30];
+const KEY = 'daily-log-v1';
+
+const pad = n => String(n).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate()+n); return iso(d); };
+
+let db = { names: ['Person 1', 'Person 2'], days: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) db = Object.assign(db, JSON.parse(raw)); } catch (e) {}
+let syncState = 'connecting', pending = 0, pass = '';
+try { pass = localStorage.getItem('daily-pass') || ''; } catch (e) {}
+let asking = false;
+async function api(method, body) {
+  const r = await fetch('/api/data', { method, headers: { 'Content-Type': 'application/json', 'x-passcode': pass }, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 401) {
+    if (asking) throw new Error('auth');
+    asking = true; const p = prompt('Enter the shared passcode'); asking = false;
+    if (p === null) throw new Error('auth');
+    pass = p; try { localStorage.setItem('daily-pass', p); } catch (e) {}
+    return api(method, body);
+  }
+  if (!r.ok) throw new Error(String(r.status));
+  return r.json();
+}
+function push(body) {
+  pending++;
+  api('POST', body).then(() => { syncState = 'synced'; }).catch(() => { syncState = 'offline'; }).finally(() => { pending--; clock(); });
+}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
+
+let day = iso(new Date());
+const get = (date, p, a) => ((db.days[date] || {})[p] || {})[a] || 0;
+const set = (date, p, a, v) => {
+  db.days[date] = db.days[date] || {};
+  db.days[date][p] = db.days[date][p] || {};
+  db.days[date][p][a] = Math.max(0, Math.round(v));
+  save();
+  push({ op: 'set', date, p, a, v: db.days[date][p][a] });
+};
+const complete = (date, p) => ACTIVITIES.every(a => get(date, p, a.id) >= a.target);
+const doneCount = (date, p) => ACTIVITIES.filter(a => get(date, p, a.id) >= a.target).length;
+
+function bar(v, t) {
+  const n = 24, f = Math.min(n, Math.round((v / t) * n));
+  return '█'.repeat(f) + '<s>' + '░'.repeat(n - f) + '</s>';
+}
+
+function streak(p) {
+  let n = 0, d = iso(new Date());
+  if (!complete(d, p)) d = shift(d, -1);       // today still open: count back from yesterday
+  while (complete(d, p)) { n++; d = shift(d, -1); }
+  return n;
+}
+
+function render() {
+  document.getElementById('date').value = day;
+  const cols = document.getElementById('cols');
+  cols.innerHTML = '';
+  [0, 1].forEach(p => {
+    const total = ACTIVITIES.reduce((s, a) => s + Math.min(get(day, p, a.id), a.target), 0);
+    const goal = ACTIVITIES.reduce((s, a) => s + a.target, 0);
+    const el = document.createElement('section');
+    el.className = 'person';
+    el.setAttribute('aria-label', db.names[p]);
+    if (complete(day, p)) el.classList.add('full');
+
+    let week = '';
+    for (let i = 6; i >= 0; i--) week += `<i class="${complete(shift(day, -i), p) ? 'on' : ''}" title="${shift(day, -i)}"></i>`;
+
+    el.innerHTML = `
+      <div class="phead">
+        <input class="name" value="${db.names[p].replace(/"/g,'&quot;')}" aria-label="Name" maxlength="24" />
+        <div class="score"><b>${doneCount(day, p)}/${ACTIVITIES.length}</b> done<br>${Math.round(total / goal * 100)}% of ${goal} min</div>
+      </div>
+      <div class="strip"><span>7 days</span>${week}<span style="margin-left:8px">Streak ${streak(p)}</span></div>
+      ${ACTIVITIES.map(a => {
+        const v = get(day, p, a.id), done = v >= a.target;
+        return `<div class="act ${done ? 'done' : ''}" data-a="${a.id}">
+          <div class="arow"><span class="aname">${a.label}</span><span class="amin"><b>${v}</b> / ${a.target} min</span></div>
+          <div class="bar" aria-hidden="true">${bar(v, a.target)}</div>
+          <div class="ctl">
+            ${QUICK.map(q => `<button class="add" data-q="${q}">+${q}</button>`).join('')}
+            <input type="number" min="0" inputmode="numeric" placeholder="min" aria-label="Minutes for ${a.label}" />
+            <button class="add" data-custom>Add</button>
+            <button class="add ghost" data-q="-5">−5</button>
+            <button class="add ghost" data-reset>Reset</button>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="final ${complete(day, p) ? 'on' : ''}">${complete(day, p) ? 'Decoded. All four done.' : ''}</div>`;
+
+    el.querySelector('.name').addEventListener('change', e => { db.names[p] = e.target.value.trim() || `Person ${p+1}`; save(); push({ op: 'name', p, v: db.names[p] }); render(); });
+    el.querySelectorAll('.act').forEach(row => {
+      const a = row.dataset.a;
+      const input = row.querySelector('input');
+      row.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', e => { set(day, p, a, get(day, p, a) + Number(b.dataset.q)); render(); burst(e.clientX, e.clientY); }));
+      const custom = () => { const n = Number(input.value); if (n > 0) { const r = input.getBoundingClientRect(); set(day, p, a, get(day, p, a) + n); render(); burst(r.left, r.top); } };
+      row.querySelector('[data-custom]').addEventListener('click', custom);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') custom(); });
+      row.querySelector('[data-reset]').addEventListener('click', () => { set(day, p, a, 0); render(); });
+    });
+    cols.appendChild(el);
+  });
+  const share = p => ACTIVITIES.reduce((s, a) => s + Math.min(get(day, p, a.id), a.target), 0) / ACTIVITIES.reduce((s, a) => s + a.target, 0);
+  tBloom = (share(0) + share(1)) / 2;
+  document.getElementById('pct').textContent = Math.round(tBloom * 100);
+  fillSel();
+}
+
+document.getElementById('prev').onclick = () => { day = shift(day, -1); render(); };
+document.getElementById('next').onclick = () => { day = shift(day, 1); render(); };
+document.getElementById('today').onclick = () => { day = iso(new Date()); render(); };
+document.getElementById('date').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
+
+const clock = () => { document.getElementById('clock').textContent = 'Live · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' + syncState; };
+clock(); setInterval(clock, 30000);
+
+/* ---- glyph flower: a lily drawn as text, opening with the day's progress ---- */
+const cv = document.getElementById('bg'), cx = cv.getContext('2d');
+const SET = ' .:-=+*oxX#%@', CW = 11, CH = 18;
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W, H, bloom = 0, tBloom = 0, ring = { x: 0, y: 0, r: 0, a: 0 }, mx = -999, my = -999, T0 = performance.now();
+function size() { const d = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W * d; cv.height = H * d; cx.setTransform(d, 0, 0, d, 0, 0); }
+addEventListener('resize', size); size();
+addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; });
+function burst(x, y) { ring = { x, y, r: 0, a: 1 }; }
+function lum(nx, ny, t) {
+  const r = Math.hypot(nx, ny), a = Math.atan2(ny, nx) + t * .1;
+  const k = Math.pow(Math.abs(Math.cos(3 * a)), .6);
+  const R = (.14 + .5 * bloom) * (.5 + .5 * k);
+  let v = Math.pow(Math.max(0, 1 - r / R), .7) * (.75 + .25 * Math.abs(Math.sin(a * 12)));
+  v += Math.max(0, .06 - r) * 8 * bloom;
+  return Math.min(1, v);
+}
+function draw(now) {
+  const t = still ? 0 : (now - T0) / 1000;
+  bloom += (tBloom - bloom) * (still ? 1 : .04);
+  ring.r += 14; ring.a *= .965;
+  cx.clearRect(0, 0, W, H);
+  cx.font = '500 14px "IBM Plex Mono", ui-monospace, monospace';
+  cx.textBaseline = 'top';
+  const s = Math.min(W, H) * .5, ox = W * .5, oy = H * .5;
+  for (let y = 0; y < H; y += CH) for (let x = 0; x < W; x += CW) {
+    const px = x + CW / 2, py = y + CH / 2;
+    let l = lum((px - ox) / s, (py - oy) / s, t);
+    const dp = Math.hypot(px - mx, py - my);
+    const glow = dp < 140 ? 1 - dp / 140 : 0;
+    const dr = Math.abs(Math.hypot(px - ring.x, py - ring.y) - ring.r);
+    const rh = ring.a > .02 && dr < 40 ? (1 - dr / 40) * ring.a : 0;
+    const sh = Math.sin(px * 12.9 + py * 78.2 + Math.floor(t * 6)) * 43758.5; const rnd = sh - Math.floor(sh);
+    let i = Math.round(Math.min(1, l + glow * .12) * (SET.length - 1));
+    if (rh > .3 && rnd < rh) i = 1 + Math.floor(rnd * (SET.length - 1) / rh) % (SET.length - 1);
+    if (i === 0) continue;
+    const heat = Math.min(1, glow * .8 + rh * 1.4);
+    cx.fillStyle = heat > .05 ? `rgba(214,240,107,${.18 + .6 * heat})` : `rgba(233,230,216,${.06 + .34 * l})`;
+    cx.fillText(SET[i], x, y);
+  }
+  if (!still || Math.abs(tBloom - bloom) > .002) requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+if (still) setInterval(() => requestAnimationFrame(draw), 400);
+
+/* ---- pomodoro ---- */
+const PK = 'daily-pomo-v1', $ = id => document.getElementById(id);
+let pm = { f: 25, b: 5, auto: true, who: 0, act: ACTIVITIES[0].id };
+try { Object.assign(pm, JSON.parse(localStorage.getItem(PK) || '{}')); } catch (e) {}
+const psave = () => { try { localStorage.setItem(PK, JSON.stringify(pm)); } catch (e) {} };
+let mode = 'focus', left = pm.f * 60, running = false, endAt = 0, actx = null;
+const fmt = s => pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+const TITLE = document.title;
+function fillSel() {
+  const w = $('pwho'); w.innerHTML = ''; db.names.forEach((n, i) => w.add(new Option(n, i))); w.value = pm.who;
+  const a = $('pact'); if (!a.options.length) { ACTIVITIES.forEach(x => a.add(new Option(x.label, x.id))); } a.value = pm.act;
+}
+function paint() {
+  const total = (mode === 'focus' ? pm.f : pm.b) * 60, c = Math.max(0, Math.ceil(left));
+  $('ptime').textContent = fmt(c);
+  $('pmode').textContent = mode === 'focus' ? 'Focus' : 'Break';
+  $('pgo').textContent = running ? 'Pause' : 'Start';
+  $('pf').textContent = pm.f; $('pb').textContent = pm.b;
+  $('pfill').style.width = ((1 - left / total) * 100) + '%';
+  $('pomo').classList.toggle('run', running);
+  document.querySelectorAll('.pomo .st button[data-k]').forEach(b => b.disabled = running);
+  document.title = running ? fmt(c) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break') : TITLE;
+}
+function beep() {
+  try { const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(.15, actx.currentTime); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + 1.2); o.start(); o.stop(actx.currentTime + 1.2); } catch (e) {}
+}
+function finish() {
+  beep();
+  if (mode === 'focus') {
+    if (pm.auto) { const t = iso(new Date()); set(t, pm.who, pm.act, get(t, pm.who, pm.act) + pm.f); render(); const r = $('pomo').getBoundingClientRect(); burst(r.left + r.width / 2, r.bottom); }
+    mode = 'break'; left = pm.b * 60; running = true; endAt = Date.now() + left * 1000;
+  } else { mode = 'focus'; left = pm.f * 60; running = false; }
+}
+setInterval(() => { if (!running) return; left = (endAt - Date.now()) / 1000; if (left <= 0) finish(); paint(); }, 250);
+$('pgo').onclick = () => {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (running) running = false; else { running = true; endAt = Date.now() + left * 1000; }
+  paint();
+};
+$('prs').onclick = () => { running = false; mode = 'focus'; left = pm.f * 60; paint(); };
+document.querySelectorAll('.pomo .st button[data-k]').forEach(b => b.onclick = () => {
+  const k = b.dataset.k, lim = k === 'f' ? [5, 90] : [1, 30];
+  pm[k] = Math.min(lim[1], Math.max(lim[0], pm[k] + Number(b.dataset.d))); psave();
+  if (!running) left = (mode === 'focus' ? pm.f : pm.b) * 60;
+  paint();
+});
+$('pauto').checked = pm.auto;
+$('pauto').onchange = e => { pm.auto = e.target.checked; psave(); };
+$('pwho').onchange = e => { pm.who = Number(e.target.value); psave(); };
+$('pact').onchange = e => { pm.act = e.target.value; psave(); };
+
+render();
+paint();
+
+/* ---- server sync: pull on load, every 8s, and when the tab returns ---- */
+async function pull() {
+  if (pending > 0 || /^(INPUT|SELECT)$/.test(document.activeElement.tagName)) return;
+  try {
+    const d = await api('GET');
+    const empty = !Object.keys(d.days || {}).length;
+    if (empty && Object.keys(db.days).length) {           // first run: upload what this browser already has
+      for (const date in db.days) for (const p in db.days[date]) for (const a in db.days[date][p]) push({ op: 'set', date, p: Number(p), a, v: db.days[date][p][a] });
+      db.names.forEach((v, p) => push({ op: 'name', p, v }));
+    } else {
+      const before = JSON.stringify(db);
+      db.days = d.days || {};
+      (d.names || []).forEach((n, i) => { if (n) db.names[i] = n; });
+      save();
+      if (JSON.stringify(db) !== before) render();
+    }
+    syncState = 'synced';
+  } catch (e) { syncState = 'offline'; }
+  clock();
+}
+pull(); setInterval(pull, 8000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
+</script>
+</body>
+</html>
