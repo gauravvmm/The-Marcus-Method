@@ -1,6 +1,8 @@
 // Vercel serverless function: stores the log in Upstash Redis (one hash, one field per value).
-const URL_ = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+// Finds the Redis variables whatever prefix Vercel gave them (KV_, UPSTASH_, STORAGE_, ...).
+const find = (re) => { const k = Object.keys(process.env).find((n) => re.test(n)); return k ? process.env[k] : undefined; };
+const URL_ = find(/REST_(API_)?URL$/);
+const TOKEN = find(/REST_(API_)?TOKEN$/); // does not match READ_ONLY_TOKEN
 const KEY = 'daily-log';
 
 async function redis(cmd) {
@@ -16,10 +18,9 @@ async function redis(cmd) {
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  if (!URL_ || !TOKEN) return res.status(500).json({ error: 'Storage is not connected' });
-
   const need = process.env.APP_PASSCODE; // optional shared passcode
   if (need && req.headers['x-passcode'] !== need) return res.status(401).json({ error: 'Passcode required' });
+  if (!URL_ || !TOKEN) return res.status(500).json({ error: 'Redis not connected: add Upstash Redis in Vercel Storage, then redeploy' });
 
   try {
     if (req.method === 'GET') {
@@ -54,6 +55,6 @@ module.exports = async (req, res) => {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
-    return res.status(500).json({ error: 'Storage error' });
+    return res.status(500).json({ error: 'Redis error: ' + String(e.message).slice(0, 80) });
   }
 };

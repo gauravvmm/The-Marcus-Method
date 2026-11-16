@@ -33,7 +33,7 @@ Every later `git push` redeploys automatically.
 
 1. In your Vercel project, open the **Storage** tab.
 2. Choose **Upstash Redis** (from the Marketplace), create a free database, and connect it to the project. Vercel adds the connection variables for you.
-3. Open **Settings → Environment Variables** and check that you see either `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or `KV_REST_API_URL` and `KV_REST_API_TOKEN`. The function accepts both pairs.
+3. Open **Settings → Environment Variables** and check that you see either `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or `KV_REST_API_URL` and `KV_REST_API_TOKEN`. The function finds them whatever prefix Vercel used (`KV_`, `UPSTASH_`, `STORAGE_`).
 4. **Redeploy** (Deployments tab → latest deployment → Redeploy) so the function picks them up.
 
 Open your site. The top right should say `synced`. If you already logged minutes in a browser before this, they upload to the server the first time it connects.
@@ -56,3 +56,15 @@ vercel dev
 - Names, minutes and targets-met history live in Redis. The Pomodoro settings (focus and break length, who it logs to) stay on each device.
 - If the server can't be reached, the page keeps working from the browser's own storage and shows `offline`. It syncs again when the connection returns.
 - Targets (60 / 300 / 30 / 30) are in the `ACTIVITIES` list at the top of the script in `index.html`.
+
+## If it says `offline`
+
+The line at the bottom of the page now states the reason:
+
+- `open the deployed site, not the file`: you opened `index.html` straight from your computer. Use the `https://...vercel.app` address.
+- `/api/data not found`: `api/data.js` is not in the repo root. The folder must be named `api`, next to `index.html`.
+- `Redis not connected`: the database isn't attached to this project, or you haven't redeployed since attaching it.
+- `Redis error: ...`: the database is attached but rejected the request. Check the token in Environment Variables.
+- `Passcode required`: enter the passcode when asked, or remove `APP_PASSCODE`.
+
+You can also open `https://YOUR-SITE.vercel.app/api/data` in a browser. A working setup shows `{"days":{},"names":[null,null]}`.

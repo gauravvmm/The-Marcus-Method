@@ -117,6 +117,7 @@ h1{text-shadow:0 0 40px rgba(10,11,9,.8)}
     <button class="pill" id="today">Today</button>
   </div>
   <main class="cols" id="cols"></main>
+  <p class="foot" style="color:#d6f06b" id="syncmsg"></p>
   <p class="foot">Saved on the server and shared between you both. Click a name to rename it. Targets live in the ACTIVITIES list at the top of the script.</p>
 </div>
 
@@ -138,7 +139,7 @@ const shift = (s, n) => { const d = parse(s); d.setDate(d.getDate()+n); return i
 
 let db = { names: ['Person 1', 'Person 2'], days: {} };
 try { const raw = localStorage.getItem(KEY); if (raw) db = Object.assign(db, JSON.parse(raw)); } catch (e) {}
-let syncState = 'connecting', pending = 0, pass = '';
+let syncState = 'connecting', syncErr = '', pending = 0, pass = '';
 try { pass = localStorage.getItem('daily-pass') || ''; } catch (e) {}
 let asking = false;
 async function api(method, body) {
@@ -150,12 +151,17 @@ async function api(method, body) {
     pass = p; try { localStorage.setItem('daily-pass', p); } catch (e) {}
     return api(method, body);
   }
-  if (!r.ok) throw new Error(String(r.status));
+  if (!r.ok) {
+    let m = 'error ' + r.status;
+    try { m = (await r.json()).error || m; } catch (e) { if (r.status === 404) m = '/api/data not found: is api/data.js in the repo?'; }
+    throw new Error(m);
+  }
   return r.json();
 }
+const why = e => location.protocol === 'file:' ? 'open the deployed site, not the file' : (e.message || 'unreachable');
 function push(body) {
   pending++;
-  api('POST', body).then(() => { syncState = 'synced'; }).catch(() => { syncState = 'offline'; }).finally(() => { pending--; clock(); });
+  api('POST', body).then(() => { syncState = 'synced'; syncErr = ''; }).catch(e => { syncState = 'offline'; syncErr = why(e); }).finally(() => { pending--; clock(); });
 }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
 
@@ -243,7 +249,7 @@ document.getElementById('next').onclick = () => { day = shift(day, 1); render();
 document.getElementById('today').onclick = () => { day = iso(new Date()); render(); };
 document.getElementById('date').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
 
-const clock = () => { document.getElementById('clock').textContent = 'Live · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' + syncState; };
+const clock = () => { document.getElementById('clock').textContent = 'Live · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' + syncState; document.getElementById('syncmsg').textContent = syncState === 'offline' ? 'Not syncing: ' + syncErr : ''; };
 clock(); setInterval(clock, 30000);
 
 /* ---- glyph flower: a lily drawn as text, opening with the day's progress ---- */
@@ -362,8 +368,8 @@ async function pull() {
       save();
       if (JSON.stringify(db) !== before) render();
     }
-    syncState = 'synced';
-  } catch (e) { syncState = 'offline'; }
+    syncState = 'synced'; syncErr = '';
+  } catch (e) { syncState = 'offline'; syncErr = why(e); }
   clock();
 }
 pull(); setInterval(pull, 8000);
