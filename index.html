@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0a0b09" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
 <title>Daily Log — Two People, Four Habits</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -115,6 +118,7 @@ h1{text-shadow:0 0 40px rgba(10,11,9,.8)}
     <input type="date" id="date" aria-label="Date" />
     <button class="pill" id="next" aria-label="Next day">Next</button>
     <button class="pill" id="today">Today</button>
+    <button class="pill" id="install" hidden>Install app</button>
   </div>
   <main class="cols" id="cols"></main>
   <p class="foot" style="color:#d6f06b" id="syncmsg"></p>
@@ -373,6 +377,14 @@ async function pull() {
   clock();
 }
 pull(); setInterval(pull, 8000);
+
+/* ---- installable app (PWA) ---- */
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+let installEv = null;
+const ib = document.getElementById('install');
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEv = e; ib.hidden = false; });
+addEventListener('appinstalled', () => { installEv = null; ib.hidden = true; });
+ib.onclick = async () => { if (!installEv) return; installEv.prompt(); await installEv.userChoice; installEv = null; ib.hidden = true; };
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
 </script>
 </body>
